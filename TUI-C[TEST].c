@@ -4,10 +4,10 @@
 
 #include <ncurses.h>
 
-initscr(); # Initialize ncurses
-cbreak(); # disables line buffering
-noecho(); # prevents echoing keypresses to UI
-keypad(stdscr, TRUE); # allows keyboard function
+initscr(); // Initialize ncurses
+cbreak(); // disables line buffering
+noecho(); // prevents echoing keypresses to UI
+keypad(stdscr, TRUE); // allows keyboard function
 
 // Time to add options, you can customize these!
 
