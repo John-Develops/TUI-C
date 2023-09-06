@@ -1,58 +1,81 @@
 // TUI-C is a Terminal UI made in C, just like the name!
 // intended for easy setup, just run the file in a C editor
-// if on Linux (make sure ncurses is installed), use: gcc -o TUI-C[TEST].C -lncurses
+// if on Linux (make sure ncurses is installed), use: gcc -o TUI-C TUI-C.c -lncurses
+// to run on linux do: ./TUI-C
 
 #include <ncurses.h>
+#include <stdlib.h>
 
-initscr(); // Initialize ncurses
-cbreak(); // disables line buffering
-noecho(); // prevents echoing keypresses to UI
-keypad(stdscr, TRUE); // allows keyboard function
+int main() {
+    // Initialize ncurses
+    initscr();
+    cbreak();
+    noecho();
+    keypad(stdscr, TRUE);
 
-// Time to add options, you can customize these!
+    // Create a window for the main content
+    WINDOW *mainwin = newwin(320, 240, 2, 2);
 
-char* options[] = {"Option 1, Option 2, Option 3, Option 4, Option 5"};
+    // Define menu items
+    // You can customize these
+    char *menu_items[] = {
+        "Option 1",
+        "Option 2",
+        "Option 3",
+        "Option 4",
+        "Option 5"
+    };
 
-void displayOptions(int currentOption, char* options[], int numOptions) {
-    clear();  // Clear the screen
-    for (int i = 0; i < numOptions; i++) {
-        if (i == currentOption) {
-            attron(A_REVERSE);  // Highlight the selected option
+    int num_items = sizeof(menu_items) / sizeof(menu_items[0]);
+    int current_item = 0;
+
+    while (1) {
+        // Clear the main window
+        werase(mainwin);
+
+        // Print the menu items
+        for (int i = 0; i < num_items; i++) {
+            if (i == current_item) {
+                wattron(mainwin, A_REVERSE);
+            }
+            mvwprintw(mainwin, i, 0, menu_items[i]);
+            wattroff(mainwin, A_REVERSE);
         }
-        mvprintw(i + 1, 1, "%s", options[i]);
-        attroff(A_REVERSE);  // Turn off highlighting
+
+        // Refresh the main window
+        wrefresh(mainwin);
+
+        // Get user input
+        int choice = getch();
+
+        switch (choice) {
+            case KEY_UP:
+                if (current_item > 0) {
+                    current_item--;
+                }
+                break;
+            case KEY_DOWN:
+                if (current_item < num_items - 1) {
+                    current_item++;
+                }
+                break;
+            case 10: // Enter key
+                // You can add logic to perform actions based on the selected menu item
+                break;
+            default:
+                break;
+        }
+
+        // Exit the loop when 'q' is pressed
+        if (choice == 'q') {
+            break;
+        }
     }
-    refresh();  // Refresh the screen
+
+    // Clean up and exit
+    delwin(mainwin);
+    endwin();
+    refresh();
+
+    return 0;
 }
-
-int currentOption = 0;
-int key;
-
-while (1) {
-    displayOptions(currentOption, options, sizeof(options) / sizeof(options[0]));
-    key = getch();
-
-    switch (key) {
-        case KEY_UP:
-            if (currentOption > 0) {
-                currentOption--;
-            }
-            break;
-        case KEY_DOWN:
-            if (currentOption < sizeof(options) / sizeof(options[0]) - 1) {
-                currentOption++;
-            }
-            break;
-        case 10:  // Enter key
-            // Handle the selected option (e.g., perform an action)
-            break;
-        default:
-            break;
-    }
-
-    if (key == 10) {
-        break;  // Exit the loop when Enter key is pressed
-    }
-}
-
-endwin(); // close the window and clean up
